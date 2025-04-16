@@ -1,13 +1,10 @@
 /**
- * SITE INTERATIVO - JAVASCRIPT COMPLETO
- * Contém todos os efeitos especiais, modos e interações
+ * SITE INTERATIVO - JAVASCRIPT COMPLETO E CORRIGIDO
  */
 
 // =============================================
 // CONFIGURAÇÕES INICIAIS
 // =============================================
-
-// Detecção de dispositivo móvel
 const isMobile =
   /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
@@ -16,8 +13,6 @@ const isMobile =
 // =============================================
 // SISTEMA DE MODOS ESPECIAIS
 // =============================================
-
-// Definição dos modos disponíveis
 const modes = {
   NORMAL: null,
   SHAKE: "shake-mode",
@@ -31,36 +26,28 @@ const modes = {
 let currentMode = modes.NORMAL;
 let modeTimeout = null;
 
-// Ativa/desativa modos
 function toggleMode(mode, duration = null) {
-  // Se já está no modo solicitado, desativa
   if (currentMode === mode) {
     deactivateMode(mode);
     return;
   }
 
-  // Desativa o modo atual
   if (currentMode !== modes.NORMAL) {
     deactivateMode(currentMode);
   }
 
-  // Ativa o novo modo
   activateMode(mode, duration);
 }
 
 function activateMode(mode, duration = null) {
   document.body.classList.add(mode);
   currentMode = mode;
-
   showMessage(`Modo ${getModeName(mode)} ativado!`);
 
-  // Configura timeout para modos temporários
   if (duration) {
     clearTimeout(modeTimeout);
     modeTimeout = setTimeout(() => {
-      if (currentMode === mode) {
-        deactivateMode(mode);
-      }
+      if (currentMode === mode) deactivateMode(mode);
     }, duration);
   }
 }
@@ -87,13 +74,11 @@ function getModeName(mode) {
 // =============================================
 // IMPLEMENTAÇÃO DOS MODOS ESPECIAIS
 // =============================================
-
-// 1. MODO SHAKE (Dispositivos móveis)
 let lastShakeTime = 0;
 let shakeCount = 0;
 
 function handleShake(e) {
-  if (!isMobile) return;
+  if (!isMobile || currentMode === modes.SHAKE) return;
 
   const acceleration = e.accelerationIncludingGravity;
   const shakeIntensity =
@@ -113,12 +98,11 @@ function handleShake(e) {
   }
 }
 
-// 2. MODO RAINBOW (Toque triplo em mobile)
 let lastTapTime = 0;
 let tapCount = 0;
 
 function handleTripleTap(e) {
-  if (!isMobile) return;
+  if (!isMobile || currentMode === modes.RAINBOW) return;
 
   const currentTime = new Date().getTime();
   const tapInterval = currentTime - lastTapTime;
@@ -136,7 +120,6 @@ function handleTripleTap(e) {
   lastTapTime = currentTime;
 }
 
-// 3. KONAMI CODE (↑↑↓↓←→←→BA)
 const konamiCode = [
   "ArrowUp",
   "ArrowUp",
@@ -163,19 +146,16 @@ function handleKonamiCode(e) {
   }
 }
 
-// 4. CURSOR LOUCO (Duplo clique)
 function handleDoubleClick() {
+  if (currentMode === modes.CRAZY_CURSOR) return;
   toggleMode(modes.CRAZY_CURSOR);
 }
 
-// 5. MODO DISCO (Tecla 'd')
 function handleDiscoMode(e) {
-  if (e.key === "d" || e.key === "D") {
-    toggleMode(modes.DISCO);
-  }
+  if (currentMode === modes.DISCO) return;
+  if (e.key === "d" || e.key === "D") toggleMode(modes.DISCO);
 }
 
-// 6. MODO DIVERTIDO (Easter egg)
 function setupFunModeEasterEgg() {
   const easterEgg = document.getElementById("easter-egg");
   if (easterEgg) {
@@ -186,10 +166,69 @@ function setupFunModeEasterEgg() {
 }
 
 // =============================================
-// EFEITOS VISUAIS E ANIMAÇÕES
+// EASTER EGG DA LETRA Y (CORRIGIDO)
 // =============================================
+function setupLetterYEasterEgg() {
+  const letterY = document.querySelector(".special-letter");
+  if (!letterY) return;
 
-// Efeito de toque na tela
+  let lastClickTime = 0;
+  let clickCount = 0;
+
+  const eventType = isMobile ? "touchstart" : "click";
+
+  letterY.addEventListener(
+    eventType,
+    function (e) {
+      if (isMobile) e.preventDefault();
+
+      const now = Date.now();
+      const doubleClickDelay = 300; // 300ms para considerar clique duplo
+
+      // Se o tempo entre cliques for muito longo, reinicia a contagem
+      if (now - lastClickTime > doubleClickDelay) {
+        clickCount = 0;
+      }
+
+      clickCount++;
+      lastClickTime = now;
+
+      // Se for o segundo clique dentro do intervalo
+      if (clickCount === 2) {
+        revealYSecret();
+        clickCount = 0; // Reseta a contagem
+      }
+
+      // Agendamento para resetar a contagem se não houver segundo clique
+      setTimeout(() => {
+        if (now === lastClickTime) {
+          clickCount = 0;
+        }
+      }, doubleClickDelay);
+    },
+    { passive: false }
+  );
+}
+
+function revealYSecret() {
+  const yContainer = document.querySelector(".special-letter");
+  if (!yContainer) return;
+
+  // Remove mensagem existente se houver
+  const existingMessage = yContainer.querySelector(".secret-message");
+  if (existingMessage) existingMessage.remove();
+
+  const message = document.createElement("div");
+  message.className = "secret-message";
+  message.innerHTML =
+    "🎊 <strong>Você é persistente!</strong> 🎊<br>Jamily significa J.O.V.E.M incrível!";
+  yContainer.appendChild(message);
+  createConfettiEffect(yContainer);
+}
+
+// =============================================
+// EFEITOS VISUAIS
+// =============================================
 function createTapEffect(x, y) {
   const colors = ["#ff5c8a", "#4cc9f0", "#9d4edd", "#ffd166"];
   const effect = document.createElement("div");
@@ -199,11 +238,9 @@ function createTapEffect(x, y) {
   effect.style.backgroundColor =
     colors[Math.floor(Math.random() * colors.length)];
   document.body.appendChild(effect);
-
   setTimeout(() => effect.remove(), 600);
 }
 
-// Efeito de confete
 function createConfettiEffect(element) {
   const colors = ["#ff5c8a", "#4cc9f0", "#9d4edd", "#ffd166"];
   const rect = element.getBoundingClientRect();
@@ -219,12 +256,10 @@ function createConfettiEffect(element) {
     confetti.style.setProperty("--random-x", Math.random() * 200 - 100);
     confetti.style.setProperty("--random-y", Math.random() * 100 + 50);
     document.body.appendChild(confetti);
-
     setTimeout(() => confetti.remove(), 3000);
   }
 }
 
-// Mensagem flutuante
 function showMessage(text) {
   const existing = document.querySelector(".mobile-message");
   if (existing) existing.remove();
@@ -243,8 +278,6 @@ function showMessage(text) {
 // =============================================
 // COMPONENTES INTERATIVOS
 // =============================================
-
-// Cursor personalizado
 function setupCustomCursor() {
   const cursor = document.querySelector(".cursor");
   if (!cursor) return;
@@ -270,57 +303,6 @@ function setupCustomCursor() {
   });
 }
 
-// Easter Egg da Letra Y
-function setupLetterYEasterEgg() {
-  const letterY = document.querySelector(".special-letter");
-  if (!letterY) return;
-
-  let lastTap = 0;
-  let tapCount = 0;
-
-  // Configura para ambos mobile e desktop
-  const eventType = isMobile ? "touchstart" : "click";
-
-  letterY.addEventListener(
-    eventType,
-    function (e) {
-      if (isMobile) e.preventDefault();
-
-      const now = Date.now();
-      const doubleTapDelay = 300; // 300ms para considerar clique duplo
-
-      if (now - lastTap < doubleTapDelay) {
-        tapCount++;
-
-        if (tapCount === 2) {
-          // Clique duplo detectado
-          revealYSecret();
-          tapCount = 0; // Reseta o contador
-        }
-      } else {
-        tapCount = 1; // Começa nova contagem
-      }
-
-      lastTap = now;
-    },
-    { passive: false }
-  );
-}
-
-// Função para revelar o segredo (mantida igual)
-function revealYSecret() {
-  const yContainer = document.querySelector(".special-letter");
-  if (yContainer && !yContainer.querySelector(".secret-message")) {
-    const message = document.createElement("div");
-    message.className = "secret-message";
-    message.innerHTML =
-      "🎊 <strong>Você é persistente!</strong> 🎊<br>Jamily significa J.O.V.E.M incrível!";
-    yContainer.appendChild(message);
-    createConfettiEffect(yContainer);
-  }
-}
-
-// Animação de digitação
 function setupTypewriterEffect() {
   const element = document.getElementById("typed-text");
   if (!element) return;
@@ -351,7 +333,6 @@ function setupTypewriterEffect() {
   setTimeout(typeWriter, 1000);
 }
 
-// Animação das letras
 function setupLetterAnimations() {
   const container = document.getElementById("letter-animation");
   if (!container) return;
@@ -390,7 +371,6 @@ function setupLetterAnimations() {
   });
 }
 
-// Sistema de Quiz
 function setupQuiz() {
   const options = document.querySelectorAll(".option");
   if (options.length === 0) return;
@@ -407,7 +387,7 @@ function setupQuiz() {
           document.getElementById("quiz-question")?.classList.add("hidden");
 
           if (Math.random() < 0.1) {
-            quizResult.innerHTML += `<p class="mini-easter-egg">(Psst... clique 5x na letra Y mais tarde!)</p>`;
+            quizResult.innerHTML += `<p class="mini-easter-egg">(Psst... clique 2x na letra Y mais tarde!)</p>`;
           }
         }
       }, 300);
@@ -418,7 +398,6 @@ function setupQuiz() {
 // =============================================
 // INICIALIZAÇÃO
 // =============================================
-
 document.addEventListener("DOMContentLoaded", function () {
   // Configurações específicas para mobile
   if (isMobile) {
