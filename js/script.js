@@ -316,9 +316,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!existingMessage) {
                   const message = document.createElement("div");
                   message.className = "secret-message";
-                  message.innerHTML =
-                    "🎊 <strong>Você é persistente mesmo!</strong> 🎊<br>" +
-                    "Jamily significa J.O.V.E.M incrível!";
+                  message.innerHTML = `🎊 <strong>Você é persistente mesmo!</strong> 🎊<br>
+                  Jamily significa: uma <strong>J.O.V.E.M incrível</strong>, cheia de luz e atitude!`;
 
                   // Estilos para a mensagem
                   message.style.marginTop = "15px";
