@@ -312,9 +312,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (index === letterMeanings.length - 1 && continueBtn) {
           setTimeout(() => {
             continueBtn.classList.remove("hidden");
-          }, 500);
+          }, 1000);
         }
-      }, index * 300);
+      }, index * 800);
     });
   }
 
@@ -387,18 +387,6 @@ document.addEventListener("DOMContentLoaded", function () {
       setTimeout(() => {
         alert("🎉 Código Konami ativado! Modo Dançante habilitado! 🕺");
       }, 500);
-    }
-  });
-
-  // Easter Egg do Cursor Louco
-  let crazyMode = false;
-  document.addEventListener("dblclick", () => {
-    crazyMode = !crazyMode;
-    if (crazyMode) {
-      document.body.classList.add("crazy-cursor");
-      alert("🐇 Modo Coelho Energético Ativado!");
-    } else {
-      document.body.classList.remove("crazy-cursor");
     }
   });
 
