@@ -275,32 +275,39 @@ function setupLetterYEasterEgg() {
   const letterY = document.querySelector(".special-letter");
   if (!letterY) return;
 
-  let tapCount = 0;
   let lastTap = 0;
+  let tapCount = 0;
 
-  const handler = isMobile ? "touchstart" : "click";
+  // Configura para ambos mobile e desktop
+  const eventType = isMobile ? "touchstart" : "click";
 
   letterY.addEventListener(
-    handler,
+    eventType,
     function (e) {
       if (isMobile) e.preventDefault();
 
       const now = Date.now();
-      if (now - lastTap < 300) {
+      const doubleTapDelay = 300; // 300ms para considerar clique duplo
+
+      if (now - lastTap < doubleTapDelay) {
         tapCount++;
-        if (tapCount >= 5) {
+
+        if (tapCount === 2) {
+          // Clique duplo detectado
           revealYSecret();
-          tapCount = 0;
+          tapCount = 0; // Reseta o contador
         }
       } else {
-        tapCount = 1;
+        tapCount = 1; // Começa nova contagem
       }
+
       lastTap = now;
     },
     { passive: false }
   );
 }
 
+// Função para revelar o segredo (mantida igual)
 function revealYSecret() {
   const yContainer = document.querySelector(".special-letter");
   if (yContainer && !yContainer.querySelector(".secret-message")) {
