@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
       { letter: "M", meaning: "Misteriosa (como esse site 👀)" },
       { letter: "I", meaning: "Iluminada" },
       { letter: "L", meaning: "Linda, mas isso você já sabia" },
-      { letter: "Y", meaning: "You're amazing", special: true }, // Marca a letra Y como especial
+      { letter: "Y", meaning: "You're amazing", special: true },
     ];
 
     const container = document.getElementById("letter-animation");
@@ -290,38 +290,86 @@ document.addEventListener("DOMContentLoaded", function () {
         if (container) {
           container.appendChild(letterDiv);
 
-          // Easter Egg na letra Y
+          // Easter Egg na letra Y (5 cliques)
           if (item.letter === "Y") {
             let clickCount = 0;
-            letterDiv.addEventListener("click", () => {
-              clickCount++;
-              if (clickCount >= 10) {
-                letterDiv.innerHTML += `<div class="y-easter-egg">🎉 Você é curiosa mesmo! 🎉</div>`;
+            let lastClickTime = 0;
+            const CLICK_DELAY = 1000; // 1 segundo para contar múltiplos cliques
+
+            const handleClick = () => {
+              const now = Date.now();
+
+              // Se passou muito tempo desde o último clique, reinicia a contagem
+              if (now - lastClickTime > CLICK_DELAY) {
+                clickCount = 0;
               }
-            });
+
+              clickCount++;
+              lastClickTime = now;
+
+              console.log(`Clique ${clickCount} no Y`);
+
+              // Se atingiu 5 cliques dentro do período
+              if (clickCount === 5) {
+                const existingMessage =
+                  letterDiv.querySelector(".secret-message");
+                if (!existingMessage) {
+                  const message = document.createElement("div");
+                  message.className = "secret-message";
+                  message.innerHTML =
+                    "🎊 <strong>Você é persistente mesmo!</strong> 🎊<br>" +
+                    "Jamily significa J.O.V.E.M incrível!";
+
+                  // Estilos para a mensagem
+                  message.style.marginTop = "15px";
+                  message.style.padding = "10px";
+                  message.style.borderRadius = "8px";
+                  message.style.background = "rgba(0,0,0,0.7)";
+                  message.style.animation = "fadeIn 0.5s forwards";
+
+                  letterDiv.appendChild(message);
+                  createConfettiEffect(letterDiv);
+                  showMobileMessage("🎉 Você descobriu o segredo do Y!");
+                }
+                clickCount = 0; // Reseta após mostrar a mensagem
+              }
+
+              // Reseta a contagem se não completar em 1 segundo
+              setTimeout(() => {
+                if (Date.now() - lastClickTime >= CLICK_DELAY) {
+                  clickCount = 0;
+                }
+              }, CLICK_DELAY);
+            };
+
+            // Adiciona o evento de clique
+            letterDiv.addEventListener(
+              isMobile ? "touchstart" : "click",
+              handleClick
+            );
           }
 
-          // Trigger da animação
+          // Animação da letra
           setTimeout(() => {
             letterDiv.style.opacity = "1";
             letterDiv.style.transform = "translateY(0)";
           }, 50);
         }
 
-        // Mostrar botão após última letra
+        // Mostrar botão continuar
         if (index === letterMeanings.length - 1 && continueBtn) {
           setTimeout(() => {
             continueBtn.classList.remove("hidden");
           }, 1000);
         }
-      }, index * 800);
+      }, index * 800); // Intervalo entre letras
     });
   }
 
   // Efeito de Digitação com Easter Egg
   if (document.querySelector(".final-page")) {
     const text =
-      "Prazer em te conhecer, Jamily.\nEsse site foi feito especialmente com seu nome… por alguém que acha você incrível e divertida.";
+      "Oi de novo, Jamily.\nResolvi transformar seu nome num site.Pode parecer estranho?\nPode. Mas também ficou legal.\nE eu espero que você tenha gostado!";
     const element = document.getElementById("typed-text");
     const finalBtn = document.getElementById("final-btn");
     let i = 0;
