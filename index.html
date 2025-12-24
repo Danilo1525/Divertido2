@@ -2,17 +2,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport crucial para responsividade -->
+    <!-- Viewport configurada para travar zoom e garantir escala 1:1 em celulares -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pedido Especial ❤️</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Confetti JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
@@ -20,15 +16,15 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            /* h-dvh garante que o site ocupe a altura real visível em mobile */
+            /* Garante altura total real no mobile */
             height: 100dvh; 
             width: 100vw;
-            overflow: hidden;
+            overflow: hidden; /* Impede rolagem quando o botão mexe */
             background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
             background-size: 400% 400%;
             animation: gradientBG 10s ease infinite;
-            /* Previne zoom acidental em mobile */
-            touch-action: manipulation;
+            /* Melhora resposta ao toque */
+            touch-action: none;
         }
 
         @keyframes gradientBG {
@@ -37,7 +33,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Animações Suaves */
         .fade-in { animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         .hidden-anim { display: none; opacity: 0; }
         
@@ -46,16 +41,21 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Emojis caindo */
+        /* Animação da Notificação (Toast) */
+        .toast-enter {
+            animation: toastSlideDown 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        @keyframes toastSlideDown {
+            from { transform: translateY(-100%) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
         .sad-emoji {
             position: fixed;
-            font-size: 3rem; /* Menor para mobile */
+            font-size: 3rem; 
             pointer-events: none;
             z-index: 50;
             animation: dropAndFade 1.5s ease-in forwards;
-        }
-        @media (min-width: 768px) {
-            .sad-emoji { font-size: 4rem; }
         }
 
         @keyframes dropAndFade {
@@ -63,7 +63,6 @@
             100% { opacity: 0; transform: translateY(100px) rotate(45deg); }
         }
 
-        /* Corações flutuantes */
         .floating-heart {
             position: fixed;
             bottom: -50px;
@@ -81,16 +80,15 @@
             100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
         }
 
-        /* Botão Fugitivo */
         #naoBtn {
-            transition: all 0.2s ease-out; /* Mais rápido para parecer ágil */
+            transition: top 0.25s ease-out, left 0.25s ease-out, transform 0.2s ease;
             position: relative;
-            /* Evita seleção de texto no botão */
+            /* Impede seleção de texto ao tocar rápido */
             user-select: none; 
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Coração Pulsante */
         .big-heart {
             animation: heartbeat 1.5s infinite;
         }
@@ -103,7 +101,256 @@
         }
     </style>
 </head>
-<body class="text-gray-800 flex items-center justify-center">
+<body class="text-gray-800 flex items-center justify-center relative">
+
+    <!-- Container de Mensagens Secretas (Melhor posicionado para mobile) -->
+    <!-- z-50 garante que fique acima de tudo. Top-12% para não ficar colado na borda superior -->
+    <div id="toast-container" class="fixed top-[15%] left-0 right-0 z-50 pointer-events-none flex justify-center px-4"></div>
+
+    <!-- Container Principal -->
+    <div class="relative w-11/12 max-w-lg mx-auto p-4 z-20">
+        
+        <!-- Tela da Pergunta -->
+        <div id="tela-inicial" class="bg-white/30 backdrop-blur-md border border-white/50 rounded-3xl p-6 shadow-2xl text-center fade-in">
+            <div class="mb-4 text-5xl animate-bounce">💌</div>
+            
+            <h1 class="text-3xl font-extrabold mb-8 text-rose-600 drop-shadow-sm leading-tight">
+                Quer namorar comigo?
+            </h1>
+            
+            <div id="botoes-container" class="relative flex flex-col justify-center items-center gap-4 min-h-[140px]">
+                <!-- Botão SIM ocupa largura total no mobile para facilitar o clique -->
+                <button id="simBtn" class="w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xl py-4 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 z-30">
+                    SIM!
+                </button>
+                
+                <!-- Botão NÃO -->
+                <button id="naoBtn" class="w-full bg-white text-rose-500 border-2 border-rose-500 hover:bg-rose-50 font-bold text-xl py-4 px-8 rounded-full shadow-lg z-30">
+                    Não
+                </button>
+            </div>
+        </div>
+
+        <!-- Tela Final -->
+        <div id="tela-final" class="hidden-anim text-center bg-white/40 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border-4 border-rose-300 relative overflow-hidden w-full">
+            
+            <div class="mb-6 mt-2">
+                <div class="text-7xl big-heart filter drop-shadow-xl">💖</div>
+            </div>
+
+            <div class="bg-white/60 p-4 rounded-xl border border-rose-200 shadow-inner mx-auto max-w-full overflow-hidden">
+                <h1 class="text-xl font-bold font-mono text-rose-700 break-words">
+                    { erro: usuário não esperava essa resposta }
+                </h1>
+            </div>
+            
+            <button onclick="location.reload()" class="mt-8 py-3 px-6 text-sm text-rose-700 underline hover:text-rose-900 cursor-pointer opacity-70 hover:opacity-100 touch-manipulation">
+                Reiniciar
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const naoBtn = document.getElementById('naoBtn');
+        const simBtn = document.getElementById('simBtn');
+        const telaInicial = document.getElementById('tela-inicial');
+        const telaFinal = document.getElementById('tela-final');
+        const toastContainer = document.getElementById('toast-container');
+
+        let simScale = 1;
+        let naoScale = 1;
+        let contadorTentativas = 0;
+        
+        // Frases secretas (0 a 5 = 6 tentativas no total)
+        const frasesSecretas = [
+            "Opa! Quase...",              
+            "Tá difícil, né?",            
+            "Você é insistente hein?",    
+            "O botão verde é mais bonito!",
+            "Sério mesmo? 🥺",            
+            "Tá bom, já não precisa de tudo isso... 😭" 
+        ];
+
+        const sadEmojis = ['😢', '😭', '💔', '🙄', '🤏', '❌', '🏃'];
+        const loveEmojis = ['❤️', '💖', '🥰', '💍', '💘', '😍', '✨'];
+
+        // ==========================================
+        // Sistema de Mensagens Otimizado
+        // ==========================================
+        function mostrarMensagemSecreta(texto) {
+            toastContainer.innerHTML = ''; 
+
+            const toast = document.createElement('div');
+            // Estilo "Card Flutuante" - Fundo escuro para contraste, largura máxima controlada
+            toast.className = 'bg-rose-600/90 text-white px-6 py-3 rounded-xl shadow-2xl font-bold text-center text-sm md:text-base toast-enter backdrop-blur-sm border border-white/20 w-10/12 max-w-sm';
+            toast.innerText = texto;
+
+            toastContainer.appendChild(toast);
+
+            // Remove após 2.5s
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-10px)';
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => { if(toast.parentNode) toast.remove(); }, 500);
+            }, 2500);
+        }
+
+        // ==========================================
+        // Lógica de Fuga do Botão (Mobile Safe)
+        // ==========================================
+        const fugirBotao = (e) => {
+            if (e && e.cancelable) e.preventDefault(); // Evita scroll ou zoom indesejado
+
+            // 1. Transforma em Absolute/Fixed na primeira interação
+            if (naoBtn.style.position !== 'fixed') {
+                const rect = naoBtn.getBoundingClientRect();
+                naoBtn.style.position = 'fixed';
+                // Define largura fixa baseada no tamanho atual para não deformar
+                naoBtn.style.width = Math.min(rect.width, 200) + 'px'; 
+                naoBtn.style.left = rect.left + 'px';
+                naoBtn.style.top = rect.top + 'px';
+            }
+
+            // 2. Verifica contador de tentativas
+            if (contadorTentativas < frasesSecretas.length) {
+                mostrarMensagemSecreta(frasesSecretas[contadorTentativas]);
+            }
+
+            // 3. Checa se é a 6ª vez (Índice 5) - HORA DE SUMIR
+            if (contadorTentativas === 5) {
+                naoBtn.style.transition = "all 0.5s ease";
+                naoBtn.style.opacity = '0';
+                naoBtn.style.transform = 'scale(0)';
+                naoBtn.style.pointerEvents = 'none';
+                
+                setTimeout(() => { naoBtn.style.display = 'none'; }, 500);
+                return;
+            }
+
+            // 4. Continua o jogo
+            contadorTentativas++;
+            spawnEmoji(sadEmojis, false);
+
+            simScale += 0.15;
+            simBtn.style.transform = `scale(${simScale})`;
+
+            // Matemática da Posição Segura (Safe Zone)
+            // Margem de segurança de 40px das bordas para o dedo não cobrir ou sair da tela
+            const safeMargin = 40; 
+            const btnWidth = naoBtn.offsetWidth;
+            const btnHeight = naoBtn.offsetHeight;
+            
+            // Largura e Altura disponíveis
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            const maxX = windowWidth - btnWidth - safeMargin;
+            const maxY = windowHeight - btnHeight - safeMargin;
+
+            // Gera posição aleatória respeitando a margem mínima e máxima
+            const randomX = Math.max(safeMargin, Math.random() * maxX);
+            const randomY = Math.max(safeMargin, Math.random() * maxY);
+
+            naoBtn.style.left = `${randomX}px`;
+            naoBtn.style.top = `${randomY}px`;
+        };
+
+        // Usa 'touchstart' com passive: false para garantir resposta imediata no celular
+        naoBtn.addEventListener('touchstart', fugirBotao, { passive: false });
+        naoBtn.addEventListener('mouseover', fugirBotao); // Fallback para PC
+
+        // ==========================================
+        // Lógica do Botão SIM
+        // ==========================================
+        simBtn.addEventListener('click', aceitarPedido);
+        simBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            aceitarPedido();
+        }, { passive: false });
+
+        function aceitarPedido() {
+            toastContainer.innerHTML = '';
+            
+            telaInicial.style.display = 'none';
+            telaFinal.style.display = 'block';
+            telaFinal.classList.remove('hidden-anim');
+            telaFinal.classList.add('fade-in');
+
+            dispararConfetes();
+
+            setInterval(() => {
+                spawnEmoji(loveEmojis, true);
+            }, 300);
+        }
+
+        // ==========================================
+        // Utilitários Visuais
+        // ==========================================
+        function spawnEmoji(emojiList, isHappy) {
+            const emoji = document.createElement('div');
+            emoji.innerText = emojiList[Math.floor(Math.random() * emojiList.length)];
+            
+            if (isHappy) {
+                emoji.className = 'floating-heart';
+                emoji.style.left = Math.random() * 85 + 'vw'; 
+                const size = Math.random() * 2 + 1.5; 
+                emoji.style.fontSize = size + 'rem';
+                emoji.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            } else {
+                emoji.className = 'sad-emoji';
+                emoji.style.left = (Math.random() * (window.innerWidth - 50)) + 'px';
+                emoji.style.top = (Math.random() * (window.innerHeight - 50)) + 'px';
+            }
+
+            document.body.appendChild(emoji);
+
+            setTimeout(() => {
+                emoji.remove();
+            }, isHappy ? 6000 : 1500);
+        }
+
+        function dispararConfetes() {
+            const isMobile = window.innerWidth < 768;
+            const count = isMobile ? 60 : 150; // Menos partículas no mobile para não travar
+
+            confetti({
+                particleCount: count,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee']
+            });
+
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: isMobile ? 2 : 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+                confetti({
+                    particleCount: isMobile ? 2 : 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
+
+
 
     <!-- Container Responsivo -->
     <div class="relative w-11/12 max-w-lg mx-auto p-4 z-20">
@@ -468,6 +715,7 @@
     </script>
 </body>
 </html>
+
 
 
 
