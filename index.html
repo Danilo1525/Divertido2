@@ -2,20 +2,33 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Viewport crucial para responsividade -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pedido Especial ❤️</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Confetti JS -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+    
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            /* h-dvh garante que o site ocupe a altura real visível em mobile */
+            height: 100dvh; 
+            width: 100vw;
             overflow: hidden;
             background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
             background-size: 400% 400%;
             animation: gradientBG 10s ease infinite;
+            /* Previne zoom acidental em mobile */
+            touch-action: manipulation;
         }
 
         @keyframes gradientBG {
@@ -24,22 +37,25 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Animações de Entrada e Saída */
+        /* Animações Suaves */
         .fade-in { animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         .hidden-anim { display: none; opacity: 0; }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Emojis tristes caindo/girando */
+        /* Emojis caindo */
         .sad-emoji {
             position: fixed;
-            font-size: 4rem;
+            font-size: 3rem; /* Menor para mobile */
             pointer-events: none;
             z-index: 50;
             animation: dropAndFade 1.5s ease-in forwards;
+        }
+        @media (min-width: 768px) {
+            .sad-emoji { font-size: 4rem; }
         }
 
         @keyframes dropAndFade {
@@ -47,11 +63,11 @@
             100% { opacity: 0; transform: translateY(100px) rotate(45deg); }
         }
 
-        /* Corações flutuando na tela final */
+        /* Corações flutuantes */
         .floating-heart {
             position: fixed;
             bottom: -50px;
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #e11d48;
             user-select: none;
             pointer-events: none;
@@ -62,16 +78,19 @@
         @keyframes floatUp {
             0% { transform: translateY(0) scale(1); opacity: 0.8; }
             50% { opacity: 1; }
-            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+            100% { transform: translateY(-110vh) scale(1.5); opacity: 0; }
         }
 
-        /* Botão fugitivo */
+        /* Botão Fugitivo */
         #naoBtn {
-            transition: all 0.3s ease;
-            position: relative; 
+            transition: all 0.2s ease-out; /* Mais rápido para parecer ágil */
+            position: relative;
+            /* Evita seleção de texto no botão */
+            user-select: none; 
+            -webkit-user-select: none;
         }
 
-        /* Efeito de pulso no coração gigante */
+        /* Coração Pulsante */
         .big-heart {
             animation: heartbeat 1.5s infinite;
         }
@@ -84,26 +103,213 @@
         }
     </style>
 </head>
-<body class="text-gray-800 h-screen w-screen flex items-center justify-center overflow-hidden">
+<body class="text-gray-800 flex items-center justify-center">
 
-    <!-- Container Principal -->
-    <div class="relative w-full max-w-lg mx-auto p-6 z-20">
+    <!-- Container Responsivo -->
+    <div class="relative w-11/12 max-w-lg mx-auto p-4 z-20">
         
         <!-- Tela da Pergunta -->
-        <div id="tela-inicial" class="bg-white/30 backdrop-blur-md border border-white/50 rounded-3xl p-8 shadow-2xl text-center fade-in">
-            <div class="mb-6 text-6xl animate-bounce">💌</div>
-            <!-- Frase embaixo removida conforme solicitado -->
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-10 text-rose-600 drop-shadow-sm">Quer namorar comigo?</h1>
+        <div id="tela-inicial" class="bg-white/30 backdrop-blur-md border border-white/50 rounded-3xl p-6 md:p-8 shadow-2xl text-center fade-in">
+            <div class="mb-4 md:mb-6 text-5xl md:text-6xl animate-bounce">💌</div>
             
-            <div id="botoes-container" class="relative flex flex-col md:flex-row justify-center items-center gap-4 h-32">
-                <button id="simBtn" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-110 active:scale-95 z-30 w-full md:w-auto">
+            <!-- Texto responsivo: diminui em telas pequenas -->
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-8 md:mb-10 text-rose-600 drop-shadow-sm leading-tight">
+                Quer namorar comigo?
+            </h1>
+            
+            <div id="botoes-container" class="relative flex flex-col md:flex-row justify-center items-center gap-3 md:gap-4 min-h-[140px]">
+                <button id="simBtn" class="w-full md:w-auto bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-lg md:text-xl py-3 md:py-4 px-8 md:px-10 rounded-full shadow-lg transform transition hover:scale-110 active:scale-95 z-30">
                     SIM!
                 </button>
-                <button id="naoBtn" class="bg-white text-rose-500 border-2 border-rose-500 hover:bg-rose-50 font-bold text-xl py-4 px-10 rounded-full shadow-lg z-30 w-full md:w-auto transition-all">
+                <button id="naoBtn" class="w-full md:w-auto bg-white text-rose-500 border-2 border-rose-500 hover:bg-rose-50 font-bold text-lg md:text-xl py-3 md:py-4 px-8 md:px-10 rounded-full shadow-lg z-30">
                     Não
                 </button>
             </div>
         </div>
+
+        <!-- Tela Final (Erro/Sucesso) -->
+        <div id="tela-final" class="hidden-anim text-center bg-white/40 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-4 border-rose-300 relative overflow-hidden w-full">
+            
+            <div class="mb-6 mt-2">
+                <div class="text-7xl md:text-8xl big-heart filter drop-shadow-xl">💖</div>
+            </div>
+
+            <!-- Caixa de erro estilo terminal -->
+            <div class="bg-white/60 p-4 md:p-6 rounded-xl border border-rose-200 shadow-inner mx-auto max-w-full overflow-hidden">
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-rose-700 break-words">
+                    { erro: usuário não esperava essa resposta }
+                </h1>
+            </div>
+            
+            <button onclick="location.reload()" class="mt-8 py-2 px-4 text-sm text-rose-700 underline hover:text-rose-900 cursor-pointer opacity-70 hover:opacity-100 touch-manipulation">
+                Reiniciar
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const naoBtn = document.getElementById('naoBtn');
+        const simBtn = document.getElementById('simBtn');
+        const telaInicial = document.getElementById('tela-inicial');
+        const telaFinal = document.getElementById('tela-final');
+
+        let simScale = 1;
+        let naoScale = 1;
+        
+        const sadEmojis = ['😢', '😭', '💔', '🙄', '🤏', '❌', '🏃'];
+        const loveEmojis = ['❤️', '💖', '🥰', '💍', '💘', '😍', '✨'];
+
+        // ==========================================
+        // Lógica Responsiva do Botão "NÃO"
+        // ==========================================
+        const fugirBotao = (e) => {
+            // Se for evento de toque, previne comportamento padrão
+            if (e && e.type === 'touchstart') e.preventDefault();
+
+            // Configuração inicial de posicionamento absoluto
+            if (naoBtn.style.position !== 'fixed') {
+                const rect = naoBtn.getBoundingClientRect();
+                naoBtn.style.position = 'fixed';
+                // Define tamanho fixo para não distorcer ao virar absolute
+                naoBtn.style.width = rect.width + 'px'; 
+            }
+
+            spawnEmoji(sadEmojis, false);
+
+            // Aumenta o SIM
+            simScale += 0.2;
+            simBtn.style.transform = `scale(${simScale})`;
+
+            // Diminui o NÃO
+            naoScale -= 0.1;
+            if (naoScale < 0) naoScale = 0;
+            naoBtn.style.transform = `scale(${naoScale})`;
+            naoBtn.style.opacity = naoScale;
+
+            if (naoScale === 0) {
+                naoBtn.style.display = 'none'; // Remove se ficar invisível
+                return;
+            }
+
+            // --- Lógica Matemática para manter na tela ---
+            // Pega as dimensões da janela e do botão
+            const btnWidth = naoBtn.offsetWidth;
+            const btnHeight = naoBtn.offsetHeight;
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Define margem de segurança (padding)
+            const padding = 20;
+
+            // Calcula área segura (Max X e Max Y)
+            const maxX = windowWidth - btnWidth - padding;
+            const maxY = windowHeight - btnHeight - padding;
+
+            // Gera coordenadas aleatórias dentro da área segura
+            const randomX = Math.max(padding, Math.random() * maxX);
+            const randomY = Math.max(padding, Math.random() * maxY);
+
+            naoBtn.style.left = `${randomX}px`;
+            naoBtn.style.top = `${randomY}px`;
+        };
+
+        // Adiciona listeners (mouse e touch)
+        naoBtn.addEventListener('mouseover', fugirBotao);
+        
+        // Touchstart é melhor que click para mobile neste caso (mais rápido)
+        naoBtn.addEventListener('touchstart', fugirBotao, { passive: false });
+
+        // ==========================================
+        // Lógica do Botão "SIM"
+        // ==========================================
+        simBtn.addEventListener('click', aceitarPedido);
+        simBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita double-tap zoom
+            aceitarPedido();
+        }, { passive: false });
+
+        function aceitarPedido() {
+            telaInicial.style.display = 'none';
+            telaFinal.style.display = 'block';
+            telaFinal.classList.remove('hidden-anim');
+            telaFinal.classList.add('fade-in');
+
+            dispararConfetes();
+
+            setInterval(() => {
+                spawnEmoji(loveEmojis, true);
+            }, 300);
+        }
+
+        // ==========================================
+        // Utilitários Visuais
+        // ==========================================
+        function spawnEmoji(emojiList, isHappy) {
+            const emoji = document.createElement('div');
+            emoji.innerText = emojiList[Math.floor(Math.random() * emojiList.length)];
+            
+            if (isHappy) {
+                emoji.className = 'floating-heart';
+                // Responsivo: usa VW para posição horizontal
+                emoji.style.left = Math.random() * 90 + 'vw'; 
+                const size = Math.random() * 2 + 1.5; 
+                emoji.style.fontSize = size + 'rem';
+                emoji.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            } else {
+                emoji.className = 'sad-emoji';
+                emoji.style.left = (Math.random() * (window.innerWidth - 50)) + 'px';
+                emoji.style.top = (Math.random() * (window.innerHeight - 50)) + 'px';
+            }
+
+            document.body.appendChild(emoji);
+
+            setTimeout(() => {
+                emoji.remove();
+            }, isHappy ? 6000 : 1500);
+        }
+
+        function dispararConfetes() {
+            // Confetes otimizados para mobile (menos partículas se tela pequena)
+            const isMobile = window.innerWidth < 768;
+            const count = isMobile ? 80 : 150;
+
+            confetti({
+                particleCount: count,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee']
+            });
+
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: isMobile ? 3 : 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+                confetti({
+                    particleCount: isMobile ? 3 : 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
+
+
 
         <!-- Tela Final (Sucesso/Erro) -->
         <div id="tela-final" class="hidden-anim text-center bg-white/40 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-4 border-rose-300 relative overflow-hidden">
@@ -262,5 +468,6 @@
     </script>
 </body>
 </html>
+
 
 
