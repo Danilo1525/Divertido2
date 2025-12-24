@@ -1,43 +1,266 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>Jamily Meaning ✨</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap"
-      rel="stylesheet"
-    />
-    <meta name="theme-color" content="#9d4edd" />
-  </head>
-  <body class="home-page">
-    <div class="particles"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Especial ❤️</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+        }
 
-    <main class="container">
-      <div class="content">
-        <h1 class="magic-text">
-          <span class="text-line">Você já parou pra pensar</span>
-          <span class="text-line">o que Jamily realmente significa?</span>
-          <span class="emoji">👀</span>
-        </h1>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        <a href="quiz.html" class="btn btn-glow pulse-on-tap">
-          <span class="btn-text">Descobrir agora</span>
-        </a>
+        /* Animações de Entrada e Saída */
+        .fade-in { animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .hidden-anim { display: none; opacity: 0; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-        <!-- Dica de Easter Egg Mobile -->
-        <div class="mobile-hint">
-          <p>Dica: Chacoalhe o celular, clique 3 vezes e descubra!</p>
+        /* Emojis tristes caindo/girando */
+        .sad-emoji {
+            position: fixed;
+            font-size: 4rem;
+            pointer-events: none;
+            z-index: 50;
+            animation: dropAndFade 1.5s ease-in forwards;
+        }
+
+        @keyframes dropAndFade {
+            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100px) rotate(45deg); }
+        }
+
+        /* Corações flutuando na tela final */
+        .floating-heart {
+            position: fixed;
+            bottom: -50px;
+            font-size: 2rem;
+            color: #e11d48;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUp linear forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+        }
+
+        /* Botão fugitivo */
+        #naoBtn {
+            transition: all 0.3s ease;
+            position: relative; 
+        }
+
+        /* Efeito de pulso no coração gigante */
+        .big-heart {
+            animation: heartbeat 1.5s infinite;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="text-gray-800 h-screen w-screen flex items-center justify-center overflow-hidden">
+
+    <!-- Container Principal -->
+    <div class="relative w-full max-w-lg mx-auto p-6 z-20">
+        
+        <!-- Tela da Pergunta -->
+        <div id="tela-inicial" class="bg-white/30 backdrop-blur-md border border-white/50 rounded-3xl p-8 shadow-2xl text-center fade-in">
+            <div class="mb-6 text-6xl animate-bounce">💌</div>
+            <!-- Frase embaixo removida conforme solicitado -->
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-10 text-rose-600 drop-shadow-sm">Quer namorar comigo?</h1>
+            
+            <div id="botoes-container" class="relative flex flex-col md:flex-row justify-center items-center gap-4 h-32">
+                <button id="simBtn" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-110 active:scale-95 z-30 w-full md:w-auto">
+                    SIM!
+                </button>
+                <button id="naoBtn" class="bg-white text-rose-500 border-2 border-rose-500 hover:bg-rose-50 font-bold text-xl py-4 px-10 rounded-full shadow-lg z-30 w-full md:w-auto transition-all">
+                    Não
+                </button>
+            </div>
         </div>
-      </div>
-    </main>
 
-    <script src="js/script.js"></script>
-  </body>
+        <!-- Tela Final (Sucesso/Erro) -->
+        <div id="tela-final" class="hidden-anim text-center bg-white/40 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-4 border-rose-300 relative overflow-hidden">
+            
+            <div class="mb-8 mt-4">
+                <div class="text-8xl big-heart filter drop-shadow-xl">💖</div>
+            </div>
+
+            <!-- Fonte monoespaçada para parecer erro de sistema -->
+            <h1 class="text-2xl md:text-3xl font-bold font-mono text-rose-700 bg-white/50 p-4 rounded-xl border border-rose-200 shadow-inner">
+                { erro: usuário não esperava essa resposta }
+            </h1>
+            
+            <!-- Texto pequeno removido -->
+            
+            <button onclick="location.reload()" class="mt-8 text-sm text-rose-700 underline hover:text-rose-900 cursor-pointer opacity-70 hover:opacity-100">
+                Reiniciar
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Script de Lógica e Animação -->
+    <script>
+        const naoBtn = document.getElementById('naoBtn');
+        const simBtn = document.getElementById('simBtn');
+        const telaInicial = document.getElementById('tela-inicial');
+        const telaFinal = document.getElementById('tela-final');
+
+        // Estado dos botões
+        let simScale = 1;
+        let naoScale = 1;
+        
+        // Lista de emojis tristes
+        const sadEmojis = ['😢', '😭', '💔', '🙄', '🤏', '❌', '🏃'];
+        // Lista de emojis felizes
+        const loveEmojis = ['❤️', '💖', '🥰', '💍', '💘', '😍', '✨'];
+
+        // ==========================================
+        // Lógica do Botão "NÃO" (Fugitivo)
+        // ==========================================
+        const fugirBotao = () => {
+            // Define posição absoluta na primeira vez
+            if (naoBtn.style.position !== 'absolute') {
+                naoBtn.style.position = 'absolute';
+                // Remove do fluxo do flexbox para não mover o SIM
+                naoBtn.style.left = 'auto';
+                naoBtn.style.top = 'auto';
+            }
+
+            // Gerar emojis tristes
+            spawnEmoji(sadEmojis, false);
+
+            // Aumenta o botão SIM
+            simScale += 0.2;
+            simBtn.style.transform = `scale(${simScale})`;
+
+            // Diminui o botão NÃO (até sumir quase)
+            naoScale -= 0.1;
+            if (naoScale < 0) naoScale = 0;
+            naoBtn.style.transform = `scale(${naoScale})`;
+            naoBtn.style.opacity = naoScale; // Fica transparente também
+
+            // Calcula nova posição aleatória
+            const maxX = window.innerWidth - 100;
+            const maxY = window.innerHeight - 100;
+            
+            const randomX = Math.random() * (maxX - 50) + 25;
+            const randomY = Math.random() * (maxY - 50) + 25;
+
+            // Aplica posição
+            naoBtn.style.position = 'fixed';
+            naoBtn.style.left = `${randomX}px`;
+            naoBtn.style.top = `${randomY}px`;
+        };
+
+        // Eventos para desktop e mobile
+        naoBtn.addEventListener('mouseover', fugirBotao);
+        naoBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            fugirBotao();
+        });
+
+        // Função auxiliar para criar emojis flutuantes
+        function spawnEmoji(emojiList, isHappy) {
+            const emoji = document.createElement('div');
+            emoji.innerText = emojiList[Math.floor(Math.random() * emojiList.length)];
+            
+            if (isHappy) {
+                emoji.className = 'floating-heart';
+                emoji.style.left = Math.random() * 100 + 'vw';
+                const size = Math.random() * 2 + 1; 
+                emoji.style.fontSize = size + 'rem';
+                emoji.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            } else {
+                emoji.className = 'sad-emoji';
+                emoji.style.left = (Math.random() * window.innerWidth) + 'px';
+                emoji.style.top = (Math.random() * window.innerHeight) + 'px';
+            }
+
+            document.body.appendChild(emoji);
+
+            setTimeout(() => {
+                emoji.remove();
+            }, isHappy ? 5000 : 1500);
+        }
+
+        // ==========================================
+        // Lógica do Botão "SIM" (Sucesso)
+        // ==========================================
+        simBtn.addEventListener('click', () => {
+            telaInicial.style.display = 'none';
+            telaFinal.style.display = 'block';
+            telaFinal.classList.remove('hidden-anim');
+            telaFinal.classList.add('fade-in');
+
+            dispararConfetes();
+
+            setInterval(() => {
+                spawnEmoji(loveEmojis, true);
+            }, 300);
+        });
+
+        function dispararConfetes() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#ffa500', '#ffff00', '#008000', '#0000ff', '#4b0082', '#ee82ee']
+            });
+
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#ff1744', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
 </html>
+
+
